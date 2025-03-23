@@ -1,0 +1,93 @@
+"""
+Simple Bat:
+
+@echo off
+cd /d "C:\caminho\do\seu\script"
+python selenium_autotask.py
+exit
+
+# Configuração de variáveis de ambiente no PowerShell:
+# [System.Environment]::SetEnvironmentVariable("USERNAME_AUTOTASK", "teste", [System.EnvironmentVariableTarget]::User)
+# [System.Environment]::SetEnvironmentVariable("PASSWORD_AUTOTASK", "senhateste", [System.EnvironmentVariableTarget]::User)
+
+# Comandos principais do Selenium:
+# driver.get(url) -> Acessa uma página
+# driver.find_element(By.XPATH, "xpath").click() -> Clica em um elemento
+# driver.find_element(By.NAME, "campo").send_keys("valor") -> Digita um texto
+# driver.implicitly_wait(tempo) -> Aguarda um tempo
+# driver.quit() -> Fecha o navegador
+"""
+
+import os
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+class AutoTaskSelenium:
+    def __init__(self):
+        """Inicializa o WebDriver."""
+        options = webdriver.ChromeOptions()
+        options.add_argument("--start-maximized")  # Maximiza a janela
+        self.driver = webdriver.Chrome(options=options)
+
+    def login(self, url):
+        """Acessa a página e realiza o login usando variáveis de ambiente."""
+        username = os.getenv("USERNAME_AUTOTASK")
+        password = os.getenv("PASSWORD_AUTOTASK")
+
+        if not username or not password:
+            raise ValueError("As variáveis de ambiente USERNAME_AUTOTASK e PASSWORD_AUTOTASK não estão definidas!")
+
+        self.driver.get(url)
+        time.sleep(2)
+
+        # Clicar no botão de login
+        self.driver.find_element(By.XPATH, "//button[contains(text(), 'Login')]").click()
+        time.sleep(1)
+
+        # Inserir usuário
+        user_field = self.driver.find_element(By.NAME, "username")
+        user_field.send_keys(username)
+        time.sleep(1)
+
+        # Inserir senha
+        pass_field = self.driver.find_element(By.NAME, "password")
+        pass_field.send_keys(password)
+        time.sleep(1)
+
+        # Clicar no botão de login
+        self.driver.find_element(By.XPATH, "//button[contains(text(), 'Entrar')]").click()
+        time.sleep(5)
+
+    def download_report(self, save_path):
+        """Navega até a área de downloads e salva o relatório."""
+        # Clicar para acessar a seção de relatórios
+        self.driver.find_element(By.XPATH, "//button[contains(text(), 'Relatórios')]").click()
+        time.sleep(2)
+
+        # Clicar para abrir a seleção de pasta
+        self.driver.find_element(By.XPATH, "//button[contains(text(), 'Selecionar Pasta')]").click()
+        time.sleep(2)
+
+        # Digitar o caminho do diretório
+        path_field = self.driver.find_element(By.NAME, "path")
+        path_field.send_keys(save_path)
+        time.sleep(1)
+
+        # Clicar em salvar
+        self.driver.find_element(By.XPATH, "//button[contains(text(), 'Salvar')]").click()
+        time.sleep(30)
+
+    def close(self):
+        """Fecha o navegador."""
+        self.driver.quit()
+
+
+if __name__ == "__main__":
+    url = "https://exemplo.com/login"
+    save_path = "C:\\Users\\SeuUsuario\\Downloads"
+
+    bot = AutoTaskSelenium()
+    bot.login(url)
+    bot.download_report(save_path)
+    bot.close()
