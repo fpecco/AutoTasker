@@ -1,2 +1,2 @@
 # AutoTasker
-Simple Python Automation for automate CSV download from a site.
+Simple Python Automation with Selenium for CSV download from a site.
